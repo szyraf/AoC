@@ -44,12 +44,12 @@ const fs = require("fs")
 
 fs.readFile("input.txt", (err, input) => {
     if (err) throw err;
-    data = input.toString()
+    let data = input.toString()
 
-    elves = data.split('\n\n')
-    maxSum = 0
+    let elves = data.split('\n\n')
+    let maxSum = 0
     elves.forEach(element => {
-        localSum = 0
+        let localSum = 0
         element.split('\n').forEach(number => {
             localSum += parseInt(number)
         })
@@ -73,12 +73,12 @@ Find the top three Elves carrying the most Calories. How many Calories are those
 
 fs.readFile("input.txt", (err, input) => {
     if (err) throw err;
-    data = input.toString()
+    let data = input.toString()
 
-    elves = data.split('\n\n')
-    topThreeSums = [0, 0, 0]
+    let elves = data.split('\n\n')
+    let topThreeSums = [0, 0, 0]
     elves.forEach(element => {
-        localSum = 0
+        let localSum = 0
         element.split('\n').forEach(number => {
             localSum += parseInt(number)
         })
@@ -93,7 +93,7 @@ fs.readFile("input.txt", (err, input) => {
             }
         }
     })
-    
+
     console.log(topThreeSums[0] + topThreeSums[1] + topThreeSums[2])
     // 201491
 });
