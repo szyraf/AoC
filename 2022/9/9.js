@@ -739,27 +739,18 @@ Now, the tail (9) visits 36 positions (including s) at least once:
 Simulate your complete series of motions on a larger rope with ten knots. How many positions does the tail of the rope visit at least once?
 */
 
-/*
 fs.readFile("input.txt", (err, input) => {
     if (err) throw err;
     let data = input.toString()
     let lines = data.split('\n')
 
-    let minimap = []
-    for (let i = 0; i < 9; i++) {
-        minimap.push(
-            [
-                [0, 0, 0],
-                [0, 3, 0],
-                [0, 0, 0]
-            ]
-        )
+    let knotsCoordinates = []
+    for (let i = 0; i < 10; i++) {
+        knotsCoordinates.push([0, 0])
     }
-    console.log(minimap)
 
-    let xT = 0, yT = 0
     const visitedCoordinates = new Set()
-    visitedCoordinates.add(JSON.stringify({x: xT, y: yT}))
+    visitedCoordinates.add(JSON.stringify({x: 0, y: 0}))
 
     lines.forEach(line => {
         let lineArr = line.replace('\r', '').split(' ').map((a, index) => index === 1 ? parseInt(a) : a)
@@ -771,66 +762,61 @@ fs.readFile("input.txt", (err, input) => {
             else if (lineArr[0] === 'D') prevY--
             else if (lineArr[0] === 'L') prevX--
 
-            for (let knots = 0; knots < 9; knots++) {
-                
-
-                if (minimap[knots].flat().includes(3)) {
-                    minimap[knots][1 - prevY][1 - prevX] = 1
-                    minimap[knots][1][1] = 2
+            for (let knots = 0; knots < 10; knots++) {
+                if (knots === 0) {
+                    knotsCoordinates[0][0] += prevX
+                    knotsCoordinates[0][1] += prevY
                 }
                 else {
-                    if (prevX === 0 && prevY === 0) {
-                        // nothing
-                    }
-                    else if (prevX !== 0 && prevY !== 0) {
-                        // TODO corners
-                    }
-                    else {
-                        let isMoving = false
-                        for (let j = 0; j < 3; j++) {
-                            if (minimap[knots][prevY === 0 ? j : 1 - prevY][prevX === 0 ? j : 1 - prevX] === 1) {
-                                if (knots === 8) {
-                                    xT += prevX + (prevX === 0 ? 1 : 1 - prevX) - (prevX === 0 ? j : 1 - prevX)
-                                    yT += prevY + (prevY === 0 ? 1 : 1 - prevY) - (prevY === 0 ? j : 1 - prevY)
-                                    visitedCoordinates.add(JSON.stringify({x: xT, y: yT}))
+                    if (Math.abs(knotsCoordinates[knots][0] - knotsCoordinates[knots - 1][0]) > 1 || Math.abs(knotsCoordinates[knots][1] - knotsCoordinates[knots - 1][1]) > 1) {
+                        let isNextTo = false
+                        for (let i = 0; i < 4; i++) {
+                            let x = 0, y = 0
+                            if      (i === 0) y++
+                            else if (i === 1) x++
+                            else if (i === 2) y--
+                            else if (i === 3) x--
+
+                            if (!(Math.abs(knotsCoordinates[knots][0] - (knotsCoordinates[knots - 1][0] + x)) > 1 || Math.abs(knotsCoordinates[knots][1] - (knotsCoordinates[knots - 1][1] + y)) > 1)) {
+                                prevX = knotsCoordinates[knots - 1][0] + x - knotsCoordinates[knots][0]
+                                prevY = knotsCoordinates[knots - 1][1] + y - knotsCoordinates[knots][1]
+                                knotsCoordinates[knots][0] = knotsCoordinates[knots - 1][0] + x
+                                knotsCoordinates[knots][1] = knotsCoordinates[knots - 1][1] + y
+
+                                if (knots === 9) {
+                                    visitedCoordinates.add(JSON.stringify({x: knotsCoordinates[knots][0], y: knotsCoordinates[knots][1]}))
                                 }
-                                else {
-                                    prevX = prevX + (prevX === 0 ? 1 : 1 - prevX) - (prevX === 0 ? j : 1 - prevX)
-                                    prevY = prevY + (prevY === 0 ? 1 : 1 - prevY) - (prevY === 0 ? j : 1 - prevY)
-                                }
-                                
-                                minimap[knots][prevY === 0 ? j : 1 - prevY][prevX === 0 ? j : 1 - prevX] = 0
-                                minimap[knots][prevY === 0 ? 1 : 1 - prevY][prevX === 0 ? 1 : 1 - prevX] = 1
-                                isMoving = true
+                                isNextTo = true
                                 break
                             }
                         }
-                        if (!isMoving) {
-                            if (minimap[knots][prevY === 0 ? 1 : 1 + prevY][prevX === 0 ? 1 : 1 + prevX] === 1) {
-                                minimap[knots][prevY === 0 ? 1 : 1 + prevY][prevX === 0 ? 1 : 1 + prevX] = 0
-                                minimap[knots][1][1] = 3
-                                prevX = 0 
-                                prevY = 0
-                            }
-                            else {
-                                let index = minimap[knots].flat().indexOf(1)
-                                minimap[knots][Math.floor(index / 3)][index % 3] = 0
-                                minimap[knots][Math.floor(index / 3) - prevY][index % 3 - prevX] = 1
-                                prevX = 0 - prevX
-                                prevY = 0 - prevY
+                        if (!isNextTo) {
+                            for (let i = 0; i < 4; i++) {
+                                let x = 0, y = 0
+                                if      (i === 0) {x++; y++}
+                                else if (i === 1) {x++; y--}
+                                else if (i === 2) {x--; y--}
+                                else if (i === 3) {x--; y++}
+    
+                                if (!(Math.abs(knotsCoordinates[knots][0] - (knotsCoordinates[knots - 1][0] + x)) > 1 || Math.abs(knotsCoordinates[knots][1] - (knotsCoordinates[knots - 1][1] + y)) > 1)) {
+                                    prevX = knotsCoordinates[knots - 1][0] + x - knotsCoordinates[knots][0]
+                                    prevY = knotsCoordinates[knots - 1][1] + y - knotsCoordinates[knots][1]
+                                    knotsCoordinates[knots][0] = knotsCoordinates[knots - 1][0] + x
+                                    knotsCoordinates[knots][1] = knotsCoordinates[knots - 1][1] + y
+    
+                                    if (knots === 9) {
+                                        visitedCoordinates.add(JSON.stringify({x: knotsCoordinates[knots][0], y: knotsCoordinates[knots][1]}))
+                                    }
+                                    break
+                                }
                             }
                         }
                     }
-
-                    
                 }
-
-
             } 
         }
     })
 
     console.log(visitedCoordinates.size)
-    // 6503
+    // 2724
 })
-*/
