@@ -220,11 +220,12 @@ class Monkey {
     testDivisibleBy = 1
     ifTrue = 0
     ifFalse = 0
+    inspectedItems = 0
 }
 
 const fs = require("fs")
 
-fs.readFile("testinput.txt", (err, input) => {
+fs.readFile("input.txt", (err, input) => {
     if (err) throw err
     let data = input.toString()
     let lines = data.replace('\r', '').split('\n').map(line => line.trim())
@@ -233,8 +234,6 @@ fs.readFile("testinput.txt", (err, input) => {
     let monkeyId = 0
 
     lines.forEach(line => {
-        console.log(line)
-
         if (line === '') {
             monkeyId++
         }
@@ -259,12 +258,188 @@ fs.readFile("testinput.txt", (err, input) => {
         }
     })
 
-    console.log(monkeys)
+    for (let i = 0; i < 20; i++) {
+        monkeys.forEach(monkey => {
+            while (monkey.items.length != 0) {
+                let worryLevel = monkey.items.shift()
+                worryLevel = Math.floor(eval(monkey.operation.replaceAll('old', worryLevel.toString())) / 3)
+                if (worryLevel % monkey.testDivisibleBy === 0) {
+                    monkeys[monkey.ifTrue].items.push(worryLevel)
+                }
+                else {
+                    monkeys[monkey.ifFalse].items.push(worryLevel)
+                }
+                monkey.inspectedItems++
+            }
+        })    
+    } 
 
-    console.log()
-    // 
+    let topInspectedItems = []
+    monkeys.forEach(monkey => {
+        topInspectedItems.push(monkey.inspectedItems)
+    })
+    topInspectedItems.sort((a, b) => b - a)
+
+    console.log(topInspectedItems[0] * topInspectedItems[1])
+    // 58322
 })
 
 /*
+--- Part Two ---
+You're worried you might not ever get your items back. So worried, in fact, that your relief that a monkey's inspection didn't damage an item no longer causes your worry level to be divided by three.
 
+Unfortunately, that relief was all that was keeping your worry levels from reaching ridiculous levels. You'll need to find another way to keep your worry levels manageable.
+
+At this rate, you might be putting up with these monkeys for a very long time - possibly 10000 rounds!
+
+With these new rules, you can still figure out the monkey business after 10000 rounds. Using the same example above:
+
+== After round 1 ==
+Monkey 0 inspected items 2 times.
+Monkey 1 inspected items 4 times.
+Monkey 2 inspected items 3 times.
+Monkey 3 inspected items 6 times.
+
+== After round 20 ==
+Monkey 0 inspected items 99 times.
+Monkey 1 inspected items 97 times.
+Monkey 2 inspected items 8 times.
+Monkey 3 inspected items 103 times.
+
+== After round 1000 ==
+Monkey 0 inspected items 5204 times.
+Monkey 1 inspected items 4792 times.
+Monkey 2 inspected items 199 times.
+Monkey 3 inspected items 5192 times.
+
+== After round 2000 ==
+Monkey 0 inspected items 10419 times.
+Monkey 1 inspected items 9577 times.
+Monkey 2 inspected items 392 times.
+Monkey 3 inspected items 10391 times.
+
+== After round 3000 ==
+Monkey 0 inspected items 15638 times.
+Monkey 1 inspected items 14358 times.
+Monkey 2 inspected items 587 times.
+Monkey 3 inspected items 15593 times.
+
+== After round 4000 ==
+Monkey 0 inspected items 20858 times.
+Monkey 1 inspected items 19138 times.
+Monkey 2 inspected items 780 times.
+Monkey 3 inspected items 20797 times.
+
+== After round 5000 ==
+Monkey 0 inspected items 26075 times.
+Monkey 1 inspected items 23921 times.
+Monkey 2 inspected items 974 times.
+Monkey 3 inspected items 26000 times.
+
+== After round 6000 ==
+Monkey 0 inspected items 31294 times.
+Monkey 1 inspected items 28702 times.
+Monkey 2 inspected items 1165 times.
+Monkey 3 inspected items 31204 times.
+
+== After round 7000 ==
+Monkey 0 inspected items 36508 times.
+Monkey 1 inspected items 33488 times.
+Monkey 2 inspected items 1360 times.
+Monkey 3 inspected items 36400 times.
+
+== After round 8000 ==
+Monkey 0 inspected items 41728 times.
+Monkey 1 inspected items 38268 times.
+Monkey 2 inspected items 1553 times.
+Monkey 3 inspected items 41606 times.
+
+== After round 9000 ==
+Monkey 0 inspected items 46945 times.
+Monkey 1 inspected items 43051 times.
+Monkey 2 inspected items 1746 times.
+Monkey 3 inspected items 46807 times.
+
+== After round 10000 ==
+Monkey 0 inspected items 52166 times.
+Monkey 1 inspected items 47830 times.
+Monkey 2 inspected items 1938 times.
+Monkey 3 inspected items 52013 times.
+After 10000 rounds, the two most active monkeys inspected items 52166 and 52013 times. Multiplying these together, the level of monkey business in this situation is now 2713310158.
+
+Worry levels are no longer divided by three after each item is inspected; you'll need to find another way to keep your worry levels manageable. Starting again from the initial state in your puzzle input, what is the level of monkey business after 10000 rounds?
 */
+
+class Monkey2 {
+    items = []
+    operation = ''
+    testDivisibleBy = 1
+    ifTrue = 0
+    ifFalse = 0
+    inspectedItems = 0
+}
+
+fs.readFile("input.txt", (err, input) => {
+    if (err) throw err
+    let data = input.toString()
+    let lines = data.replace('\r', '').split('\n').map(line => line.trim())
+
+    let monkeys = []
+    let monkeyId = 0
+
+    let superModulo = 1n
+
+    lines.forEach(line => {
+        if (line === '') {
+            monkeyId++
+        }
+        else if (line[0] === 'M') {
+            let monkey = new Monkey2()
+            monkeys.push(monkey)
+        }
+        else if (line[0] === 'S') {
+            monkeys[monkeyId].items = line.substring(16).replace(' ', '').split(',').map(number => BigInt(parseInt(number)))         
+        }
+        else if (line[0] === 'O') {
+            monkeys[monkeyId].operation = line.substring(17)
+        }
+        else if (line[0] === 'T') {
+            monkeys[monkeyId].testDivisibleBy = BigInt(parseInt(line.substring(19)))
+            superModulo *= monkeys[monkeyId].testDivisibleBy
+        }
+        else if (line[3] === 't') {
+            monkeys[monkeyId].ifTrue = parseInt(line.substring(25))
+        }
+        else if (line[3] === 'f') {
+            monkeys[monkeyId].ifFalse = parseInt(line.substring(26))
+        }
+    })
+
+    for (let i = 0; i < 10000; i++) {
+        monkeys.forEach(monkey => {
+            while (monkey.items.length != 0) {
+                let worryLevel = BigInt(monkey.items.shift())
+                let operations = monkey.operation.replaceAll('old', worryLevel.toString()).split(' ')
+                worryLevel = eval(`${operations[0]}n ${operations[1]} ${operations[2]}n`)
+                worryLevel = worryLevel % superModulo
+
+                if (worryLevel % monkey.testDivisibleBy == 0) {
+                    monkeys[monkey.ifTrue].items.push(worryLevel)
+                }
+                else {
+                    monkeys[monkey.ifFalse].items.push(worryLevel)
+                }
+                monkey.inspectedItems++
+            }
+        })
+    } 
+
+    let topInspectedItems = []
+    monkeys.forEach(monkey => {
+        topInspectedItems.push(monkey.inspectedItems)
+    })
+    topInspectedItems.sort((a, b) => b - a)
+
+    console.log(topInspectedItems[0] * topInspectedItems[1])
+    // 13937702909
+})
