@@ -110,8 +110,8 @@ import (
 func main() {
 	fmt.Println("Part 1:")
 	part1()
-	// fmt.Println("Part 2:")
-	// part2()
+	fmt.Println("Part 2:")
+	part2()
 }
 
 func part1() {
@@ -186,6 +186,12 @@ In the above example, the lowest location number can be obtained from seed numbe
 Consider all of the initial seed numbers listed in the ranges on the first line of the almanac. What is the lowest location number that corresponds to any of the initial seed numbers?
 */
 
+type Range struct {
+	start int64
+	end   int64
+	lock  bool
+}
+
 func part2() {
 	filePath := "./5/input.txt"
 	file, err := os.Open(filePath)
@@ -201,51 +207,81 @@ func part2() {
 		fileLines = append(fileLines, scanner.Text())
 	}
 
-	seeds := []int{}
-	seedsLock := []bool{}
+	seeds := []Range{}
 	for lineIndex, line := range fileLines {
-		fmt.Println("line", lineIndex)
+		// fmt.Println("line", lineIndex)
+		fmt.Println(lineIndex)
+		fmt.Println(seeds)
 		numbers := strings.Split(line, " ")
 		if numbers[0] == "seeds:" {
 			for i, seed := range numbers[1:] {
 				if i%2 == 1 {
 					continue
 				}
-				seedInt, _ := strconv.Atoi(seed)
-				length, _ := strconv.Atoi(numbers[1+i+1])
-				for j := 0; j < length; j++ {
-					seeds = append(seeds, seedInt+j)
-					seedsLock = append(seedsLock, false)
-				}
+				seedInt, _ := strconv.ParseInt(seed, 10, 64)
+				length, _ := strconv.ParseInt(numbers[1+i+1], 10, 64)
+				seeds = append(seeds, Range{seedInt, seedInt + length, false})
 			}
 
 		} else if len(numbers) == 3 {
 			for i := 0; i < len(seeds); i++ {
-				if !seedsLock[i] {
+				if !seeds[i].lock {
 					seed := seeds[i]
-					destinationStart, _ := strconv.Atoi(numbers[0])
-					sourceStart, _ := strconv.Atoi(numbers[1])
-					length, _ := strconv.Atoi(numbers[2])
-					if seed >= sourceStart && seed < sourceStart+length {
-						seeds[i] = destinationStart + (seed - sourceStart)
-						seedsLock[i] = true
+					destinationStart, _ := strconv.ParseInt(numbers[0], 10, 64)
+					sourceStart, _ := strconv.ParseInt(numbers[1], 10, 64)
+					length, _ := strconv.ParseInt(numbers[2], 10, 64)
+
+					fmt.Println(destinationStart, sourceStart, length)
+					fmt.Println(seed.start, seed.end)
+
+					if seed.start >= sourceStart && seed.start < sourceStart+length && seed.end >= sourceStart && seed.end < sourceStart+length {
+						fmt.Println("here1")
+						seeds[i].start = destinationStart + (seed.start - sourceStart)
+						seeds[i].end = destinationStart + (seed.end - sourceStart)
+						seeds[i].lock = true
+					} else if seed.start >= sourceStart && seed.start < sourceStart+length {
+						fmt.Println("here2")
+						seeds = append(seeds, Range{sourceStart + length, seed.end, false})
+
+						seeds[i].start = destinationStart + (seed.start - sourceStart)
+						seeds[i].end = destinationStart + (seed.start - sourceStart) + length - 1
+						seeds[i].lock = true
+					} else if seed.end >= sourceStart && seed.end < sourceStart+length {
+						fmt.Println("here3")
+						seeds = append(seeds, Range{seed.start, sourceStart - 1, false})
+
+						seeds[i].start = destinationStart
+						seeds[i].end = destinationStart + (seed.end - sourceStart)
+						seeds[i].lock = true
+					} else if seed.start < sourceStart && seed.end >= sourceStart+length {
+						fmt.Println("here4")
+						seeds = append(seeds, Range{seed.start, sourceStart - 1, false})
+						seeds = append(seeds, Range{sourceStart + length, seed.end, false})
+
+						seeds[i].start = destinationStart
+						seeds[i].end = destinationStart + length - 1
+						seeds[i].lock = true
 					}
 				}
 			}
 
 		} else if line == "" {
-			for i := 0; i < len(seedsLock); i++ {
-				seedsLock[i] = false
+			fmt.Println("BBBBBBBBBBBBBBBBBBBB")
+			for i := 0; i < len(seeds); i++ {
+				seeds[i].lock = false
 			}
 		}
 	}
 
-	minLocation := seeds[0]
+	fmt.Println(seeds)
+
+	minLocation := seeds[0].start
+
 	for _, seed := range seeds {
-		if seed < minLocation {
-			minLocation = seed
+		if seed.start < minLocation {
+			minLocation = seed.start
 		}
 	}
-	fmt.Println(minLocation)
 
+	fmt.Println(minLocation)
 }
