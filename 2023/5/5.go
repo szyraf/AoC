@@ -208,10 +208,7 @@ func part2() {
 	}
 
 	seeds := []Range{}
-	for lineIndex, line := range fileLines {
-		// fmt.Println("line", lineIndex)
-		fmt.Println(lineIndex)
-		fmt.Println(seeds)
+	for _, line := range fileLines {
 		numbers := strings.Split(line, " ")
 		if numbers[0] == "seeds:" {
 			for i, seed := range numbers[1:] {
@@ -220,7 +217,7 @@ func part2() {
 				}
 				seedInt, _ := strconv.ParseInt(seed, 10, 64)
 				length, _ := strconv.ParseInt(numbers[1+i+1], 10, 64)
-				seeds = append(seeds, Range{seedInt, seedInt + length, false})
+				seeds = append(seeds, Range{seedInt, seedInt + length - 1, false})
 			}
 
 		} else if len(numbers) == 3 {
@@ -231,49 +228,49 @@ func part2() {
 					sourceStart, _ := strconv.ParseInt(numbers[1], 10, 64)
 					length, _ := strconv.ParseInt(numbers[2], 10, 64)
 
-					fmt.Println(destinationStart, sourceStart, length)
-					fmt.Println(seed.start, seed.end)
-
 					if seed.start >= sourceStart && seed.start < sourceStart+length && seed.end >= sourceStart && seed.end < sourceStart+length {
-						fmt.Println("here1")
-						seeds[i].start = destinationStart + (seed.start - sourceStart)
-						seeds[i].end = destinationStart + (seed.end - sourceStart)
+						newStart := destinationStart + (seed.start - sourceStart)
+						newEnd := destinationStart + (seed.end - sourceStart)
+
+						seeds[i].start = newStart
+						seeds[i].end = newEnd
 						seeds[i].lock = true
 					} else if seed.start >= sourceStart && seed.start < sourceStart+length {
-						fmt.Println("here2")
 						seeds = append(seeds, Range{sourceStart + length, seed.end, false})
+						newStart := destinationStart + (seed.start - sourceStart)
+						newEnd := newStart + ((sourceStart + length) - seed.start - 1)
 
-						seeds[i].start = destinationStart + (seed.start - sourceStart)
-						seeds[i].end = destinationStart + (seed.start - sourceStart) + length - 1
+						seeds[i].start = newStart
+						seeds[i].end = newEnd
 						seeds[i].lock = true
 					} else if seed.end >= sourceStart && seed.end < sourceStart+length {
-						fmt.Println("here3")
 						seeds = append(seeds, Range{seed.start, sourceStart - 1, false})
+						newStart := destinationStart
+						newEnd := newStart + (seed.end - sourceStart)
 
-						seeds[i].start = destinationStart
-						seeds[i].end = destinationStart + (seed.end - sourceStart)
+						seeds[i].start = newStart
+						seeds[i].end = newEnd
 						seeds[i].lock = true
-					} else if seed.start < sourceStart && seed.end >= sourceStart+length {
-						fmt.Println("here4")
+					} else if seed.start < sourceStart && seed.end > sourceStart+length {
 						seeds = append(seeds, Range{seed.start, sourceStart - 1, false})
 						seeds = append(seeds, Range{sourceStart + length, seed.end, false})
+						newStart := destinationStart
+						newEnd := newStart + (seed.end - seed.start)
 
-						seeds[i].start = destinationStart
-						seeds[i].end = destinationStart + length - 1
+						seeds[i].start = newStart
+						seeds[i].end = newEnd
 						seeds[i].lock = true
 					}
+
 				}
 			}
 
 		} else if line == "" {
-			fmt.Println("BBBBBBBBBBBBBBBBBBBB")
 			for i := 0; i < len(seeds); i++ {
 				seeds[i].lock = false
 			}
 		}
 	}
-
-	fmt.Println(seeds)
 
 	minLocation := seeds[0].start
 
