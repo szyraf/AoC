@@ -261,7 +261,6 @@ func part2() {
 						seeds[i].end = newEnd
 						seeds[i].lock = true
 					}
-
 				}
 			}
 
