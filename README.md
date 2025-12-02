@@ -1,15 +1,12 @@
 # Advent of Code
 
-My solutions to [Advent of Code](https://adventofcode.com/)
+My [Advent of Code](https://adventofcode.com/) solutions
 
-How to run .js files? (2022)<br>
+2022 - JavaScript <br>
 `node 1.js`
 
-How to run .go files? (2023)<br>
+2023 - Go <br>
 `go run 1.go`
 
-How to run .rs files (2025)<br>
-```
-cd 2025/1
-cargo run
-```
+2025 - Rust <br>
+`cargo run --bin 1`

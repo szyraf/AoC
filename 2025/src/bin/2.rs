@@ -84,7 +84,7 @@ fn part2(file: &str) -> i64 {
     sum
 }
 fn main() {
-    let filename = env::args().nth(1).unwrap_or_else(|| "../../../AoC-input/2025/2/testinput.txt".to_string());
+    let filename = env::args().nth(1).unwrap_or_else(|| "../../AoC-input/2025/2/testinput.txt".to_string());
     let file = fs::read_to_string(&filename).expect("Failed to read file");
     
     println!("Part 1: {}", part1(&file));

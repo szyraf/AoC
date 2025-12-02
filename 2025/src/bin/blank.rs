@@ -15,7 +15,7 @@ fn part1(file: &str) -> i32 {
 // }
 
 fn main() {
-    let filename = env::args().nth(1).unwrap_or_else(|| "testinput.txt".to_string());
+    let filename = env::args().nth(1).unwrap_or_else(|| "../../AoC-input/2025/blank/testinput.txt".to_string());
     let file = fs::read_to_string(&filename).expect("Failed to read file");
     
     println!("Part 1: {}", part1(&file));
