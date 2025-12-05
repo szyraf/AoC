@@ -87,20 +87,7 @@ fn part2(file: &str) -> i64 {
                     continue;
                 }
 
-                if ranges_start[idx0] > ranges_start[idx1] {
-                    ranges_start[idx0] = ranges_start[idx1];
-                }
-                else {
-                    ranges_start[idx1] = ranges_start[idx0];
-                }
-
-                if ranges_end[idx0] < ranges_end[idx1] {
-                    ranges_end[idx0] = ranges_end[idx1];
-                }
-                else {
-                    ranges_end[idx1] = ranges_end[idx0];
-                }
-
+                ranges_end[idx0] = ranges_end[idx1];
                 ranges_start.remove(idx1);
                 ranges_end.remove(idx1);
             }
