@@ -259,11 +259,7 @@ fn part2(file: &str) -> i64 {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let filename = args.get(1)
-        .map(|s| s.clone())
-        .unwrap_or_else(|| "../../AoC-input/2025/10/input.txt".to_string());
-    
+    let filename = env::args().nth(1).unwrap_or_else(|| "../../AoC-input/2025/10/input.txt".to_string());
     let file = fs::read_to_string(&filename).expect("Failed to read file");
     
     println!("Part 1: {}", part1(&file));
