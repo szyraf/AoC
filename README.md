@@ -2,8 +2,8 @@
 
 My [Advent of Code](https://adventofcode.com/) solutions
 
-| Year | Language   | Run Command       |
-|------|------------|-------------------|
-| 2022 | JavaScript | `node 1.js`       |
-| 2023 | Go         | `go run 1.go`     |
-| 2025 | Rust       | `cargo run --bin 1` |
+| Year | Language   | Stars     | Run Command         |
+|------|------------|-----------|---------------------|
+| 2025 | Rust       | 24/24 ⭐️ | `cargo run --bin 1` |
+| 2023 | Go         | 16/50 ⭐️ | `go run 1.go`       |
+| 2022 | JavaScript | 24/50 ⭐️ | `node 1.js`         |
